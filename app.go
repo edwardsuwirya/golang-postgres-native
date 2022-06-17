@@ -71,22 +71,22 @@ func main() {
 	//fmt.Println(customerCreds)
 
 	//04. Aggregation
-	var customerCount int
-	err = db.Get(&customerCount, "SELECT count(customer_id) FROM wmb.m_customer WHERE active_member=true")
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(customerCount)
-
-	var ActiveMemberCount []struct {
-		ActiveMember bool `db:"active_member"`
-		Total        int
-	}
-	err = db.Select(&ActiveMemberCount, "SELECT active_member,count(customer_id) as Total FROM wmb.m_customer group by active_member")
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(ActiveMemberCount)
+	//var customerCount int
+	//err = db.Get(&customerCount, "SELECT count(customer_id) FROM wmb.m_customer WHERE active_member=true")
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//fmt.Println(customerCount)
+	//
+	//var ActiveMemberCount []struct {
+	//	ActiveMember bool `db:"active_member"`
+	//	Total        int
+	//}
+	//err = db.Select(&ActiveMemberCount, "SELECT active_member,count(customer_id) as Total FROM wmb.m_customer group by active_member")
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//fmt.Println(ActiveMemberCount)
 
 	//05. Create data customer baru
 	//_, err = db.NamedExec(`INSERT INTO wmb.m_customer (mobile_phone_no,name) VALUES (:phone,:name)`,
@@ -110,5 +110,18 @@ func main() {
 	//tx.MustExec(`INSERT INTO wmb.m_customer (mobile_phone_no,name,active_member) VALUES ($1,$2,$3)`,
 	//	112, "Mas Budi", 8)
 	//tx.Commit()
+
+	//07. IN Clause
+	var customers []Customer
+	var ids = []int{3, 6, 9}
+	query, args, err := sqlx.In("SELECT customer_id,mobile_phone_no,name,active_member,join_date FROM wmb.m_customer WHERE customer_id IN(?)", ids)
+	//fmt.Println(query)
+	//fmt.Println(args)
+	query = db.Rebind(query)
+	err = db.Select(&customers, query, args...)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(customers)
 
 }
