@@ -70,7 +70,7 @@ func main() {
 	//
 	//fmt.Println(customerCreds)
 
-	//04. Aggregation
+	//05. Aggregation
 	//var customerCount int
 	//err = db.Get(&customerCount, "SELECT count(customer_id) FROM wmb.m_customer WHERE active_member=true")
 	//if err != nil {
@@ -88,7 +88,7 @@ func main() {
 	//}
 	//fmt.Println(ActiveMemberCount)
 
-	//05. Create data customer baru
+	//06. Create data customer baru
 	//_, err = db.NamedExec(`INSERT INTO wmb.m_customer (mobile_phone_no,name) VALUES (:phone,:name)`,
 	//	map[string]interface{}{
 	//		"phone": "08777112113",
@@ -124,4 +124,19 @@ func main() {
 	}
 	fmt.Println(customers)
 
+	//08. Prepared Statement
+	//pre-compile SQL code, efisiensi, karena bisa digunakan berulang kali tanpa re-compile
+	var customerCreate = "Create"
+	var customerQueries = map[string]string{
+		customerCreate: `INSERT INTO wmb.m_customer(mobile_phone_no,name) VALUES ($1,$2)`,
+	}
+	ps := make(map[string]*sqlx.Stmt)
+	for n, v := range customerQueries {
+		p, err := db.Preparex(v)
+		if err != nil {
+			panic(err)
+		}
+		ps[n] = p
+	}
+	ps[customerCreate].MustExec("0811100200", "Badrun")
 }
